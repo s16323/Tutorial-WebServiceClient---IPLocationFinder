@@ -1,0 +1,60 @@
+APLIKACJA IPLocationFinder:
+
+Cel:                    Podac kraj na podstawie adresu IP podanego przez uzytkownika
+Technologia:            Java - Klient Web Serwisu
+Odpytywany serwis:      http://wsgeoip.lavasoft.com/ipservice.asmx
+
+Przykadowy darmowy Web Service:
+http://wsgeoip.lavasoft.com/ipservice.asmx  -  general info about service operations availble
+http://wsgeoip.lavasoft.com/ipservice.asmx?op=GetIpLocation  -  GetIpLocation details (let's use this one)
+http://wsgeoip.lavasoft.com/ipservice.asmx?WSDL  -  Service Description  -  WSDL
+
+tutorial:   https://www.youtube.com/watch?v=6hqDMS-oJ9k&list=PLqq-6Pq4lTTZTYpk_1DOowOGWJMIH5T39&index=3
+
+1. Co jest ważne w WSDLu?
+
+    <wsdl:service name="GeoIPService">  i porty, które są pod tym podane
+
+2. Call do web servisu wykonuje si w kodzie poprzez SEI:
+
+    SEI - Service Endpoint Interface - a class that translates clients native data to SOAP format - can be generated automatically
+
+    Trzeba użyć wsimport - program dostpny razem z javą SE.
+
+    a) Nalezy utworzyć directory:   C:\Users\Artur\IdeaProjects\Tutorial-WebServiceClient\sei
+
+    b) W terminalu odpalić wsimport:
+    użycie:
+    wsimport - sama komenda - daje liste dostepnych opcji
+    wsimport [options] <WSDL_URI>
+
+    <WSDL_URI>  :  http://wsgeoip.lavasoft.com/ipservice.asmx?WSDL
+
+    c) wsimport wygeneruje i skompiluje kod endpointu w folderze 'sei'
+        -obczail WSDL, sparsowal go, wygenerowal klasy .class i skasowal pozostaly po tym source code
+
+    d) mozna to zrobic jeszcze raz, ale tym razem zostawiamy wygenerowany source code. Uzywamy opcji wsimport.
+        -utworzyc nowe dir: sei/sei_source
+        -odpalic w /sei
+        wsimport -keep -s sei_source http://wsgeoip.lavasoft.com/ipservice.asmx?WSDL
+
+    e) Wygenerowane (nieskompilowane) klasy (.java) moan teraz uzyc jako 'stub' zeby zrobic calla do web serwisu
+
+3. Wykorzystanie wygenerowanych klas:
+    -utworzyć odpowiedni package (src/com.lavasoft)  -  w klasie mozna sprawdzic do jakiego packagu nalezy
+    -umiescic w nim klasy
+
+    -ktora klasa moze byc uzyta jako stub?  -  to jest w WSDLu
+
+        <wsdl:service name="GeoIPService">
+            <wsdl:port name="GeoIPServiceSoap" binding="tns:GeoIPServiceSoap">
+                <soap:address location="http://wsgeoip.lavasoft.com/ipservice.asmx"/>
+            </wsdl:port>
+
+4. Run --> podaj argument (jakis adres IP) Run.../Edit Configurations/RunProgram Arguments
+
+    mozna spingowac jakis adres, albo...
+    przykladowe IP: 76.5.155.49   -   USA
+                    91.222.69.28  -   PL
+
+Uwaga - Jeżeli nie wiadomo jakiej klasy z SEI uzyc to trzeba albo obczaic dokumentacje serwisu na necie, albo WSDL, jak wyzej, nie zawsze wiadomo, trzeba kombinowac.
